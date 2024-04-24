@@ -1,14 +1,9 @@
-// app/components/ThemeSwitcher.tsx
 "use client";
 
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
 import { Button } from "@nextui-org/button";
-
-// app/components/ThemeSwitcher.tsx
-
-// app/components/ThemeSwitcher.tsx
 
 function SunIcon() {
   return (

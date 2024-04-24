@@ -1,6 +1,5 @@
 import { Suspense } from "react";
 
-import { getWeather } from "@/action/getWeather";
 import ClothesCard from "@/components/ClothesCard";
 import Title from "@/components/Title";
 import Weather from "@/components/Weather";
