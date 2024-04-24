@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { Inter } from "next/font/google";
-import "./globals.css";
+
+import Nav from "@/components/Nav";
 import { Providers } from "@/providers/Providers";
+
+import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,7 +22,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <NextThemesProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem={true}
+          >
+            <>
+              <Nav />
+              <main className="m-6 h-full">{children}</main>
+            </>
+          </NextThemesProvider>
+        </Providers>
       </body>
     </html>
   );
