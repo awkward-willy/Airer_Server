@@ -18,6 +18,7 @@ import { ThemeSwitcher } from "./ThemeSwitcher";
 const menuItems = [
   { name: "首頁", href: "/" },
   { name: "介紹", href: "/intro" },
+  { name: "過往資料", href: "/pastdata" },
 ];
 
 export default function Nav() {

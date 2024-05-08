@@ -3,7 +3,7 @@
 import NextImage from "next/image";
 import Link from "next/link";
 
-import { Clothes } from "@/type/clothes";
+import { ClothesDetail } from "@/type/clothesDetail";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import { Divider } from "@nextui-org/divider";
 import { Image } from "@nextui-org/image";
@@ -17,7 +17,7 @@ import {
 } from "@nextui-org/react";
 
 type Props = {
-  clothes: Clothes;
+  clothes: ClothesDetail;
 };
 
 function ChevronDownIcon() {
@@ -43,7 +43,7 @@ export default function ClothesCard({ clothes }: Props) {
   return (
     <Card className="py-4">
       <div className="flex items-center justify-between px-4">
-        <h4 className="text-large font-bold">衣服1</h4>
+        <h4 className="text-large font-bold">衣服</h4>
         <Dropdown>
           <DropdownTrigger>
             <Button variant="light" isIconOnly>
@@ -58,10 +58,14 @@ export default function ClothesCard({ clothes }: Props) {
           </DropdownMenu>
         </Dropdown>
       </div>
-      <Link href={`/clothes/${clothes.id}`}>
+      <Link
+        href={`/clothes/${clothes.transactionId}?sensorId=${clothes.sensorId}`}
+      >
         <CardHeader className="flex-col items-start px-4 pb-0 pt-2">
           <Divider className="my-1" />
-          <small className="text-default-500">等待時間：{clothes.time}</small>
+          <small className="text-default-500">
+            等待時間：{clothes.prediction} 分鐘
+          </small>
         </CardHeader>
         <CardBody>
           <Image

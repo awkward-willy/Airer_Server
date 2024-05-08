@@ -1,11 +1,14 @@
 interface ClothesDetail {
-  id: number;
-  name: "衣物1";
-  humidity_clothes: number;
-  temperature_clothes: number;
-  temperature_sur: number;
-  humidity_sur: number;
+  id: string;
+  transactionId: string;
+  sensorId: number;
+  createdAt: Date;
+  humidityClothes: number;
+  temperatureClothes: number;
+  temperatureSurround: number;
+  humiditySurround: number;
   weight: number;
+  prediction: number;
 }
 
 export type { ClothesDetail };
