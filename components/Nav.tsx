@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 import {
@@ -11,7 +12,7 @@ import {
   NavbarMenuItem,
   NavbarMenuToggle,
 } from "@nextui-org/navbar";
-import { Link } from "@nextui-org/react";
+import { Tooltip } from "@nextui-org/tooltip";
 
 import { ThemeSwitcher } from "./ThemeSwitcher";
 
@@ -39,7 +40,10 @@ export default function Nav() {
           <ThemeSwitcher />
           {menuItems.map((item, index) => (
             <NavbarItem key={`${item}-${index}`}>
-              <Link color="foreground" href={item.href}>
+              <Link
+                href={item.href}
+                className="underline-offset-8 hover:underline"
+              >
                 {item.name}
               </Link>
             </NavbarItem>
@@ -51,10 +55,8 @@ export default function Nav() {
           {menuItems.map((item, index) => (
             <NavbarMenuItem key={`${item}-${index}`}>
               <Link
-                color="foreground"
-                className="w-full justify-center"
+                className="flex w-full justify-center underline-offset-8 hover:underline"
                 href={item.href}
-                size="lg"
               >
                 {item.name}
               </Link>

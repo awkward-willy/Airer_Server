@@ -66,6 +66,13 @@ export const getWeather = async (lat: number, lon: number) => {
     relativeHumidity2m: weatherData.hourly.relativeHumidity2m[currentIndex],
     weatherCode: weatherData.hourly.weatherCode[currentIndex],
     badWeather: badWeatherList,
+    allWeather: {
+      time: weatherData.hourly.time.slice(currentIndex),
+      temperature2m: weatherData.hourly.temperature2m.slice(currentIndex),
+      relativeHumidity2m:
+        weatherData.hourly.relativeHumidity2m.slice(currentIndex),
+      weatherCode: weatherData.hourly.weatherCode.slice(currentIndex),
+    },
   };
 
   return packedWeatherData;

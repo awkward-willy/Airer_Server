@@ -2,19 +2,20 @@
 
 import NextImage from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 import { ClothesDetail } from "@/type/clothesDetail";
+import { Button } from "@nextui-org/button";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import { Divider } from "@nextui-org/divider";
-import { Image } from "@nextui-org/image";
 import {
-  Button,
   Dropdown,
   DropdownItem,
   DropdownMenu,
   DropdownSection,
   DropdownTrigger,
-} from "@nextui-org/react";
+} from "@nextui-org/dropdown";
+import { Image } from "@nextui-org/image";
 
 type Props = {
   clothes: ClothesDetail;
@@ -34,26 +35,42 @@ function ChevronDownIcon() {
         fill="currentColor"
         fillRule="evenodd"
         clipRule="evenodd"
+        className="text-black dark:text-white"
       ></path>
     </svg>
   );
 }
 
 export default function ClothesCard({ clothes }: Props) {
+  const [coverImage, setCoverImage] = useState<string>("pants");
+
+  useEffect(() => {
+    if (clothes.weight > 200) {
+      setCoverImage("clothes");
+    }
+  }, [clothes.weight, clothes.transactionId, clothes.sensorId]);
+
   return (
-    <Card className="py-4">
-      <div className="flex items-center justify-between px-4">
-        <h4 className="text-large font-bold">衣服</h4>
+    <Card className="w-fit p-4">
+      <div className="flex items-baseline justify-between pl-4">
+        <h4 className="text-large font-bold">衣架 {clothes.sensorId + 1}</h4>
         <Dropdown>
           <DropdownTrigger>
             <Button variant="light" isIconOnly>
               <ChevronDownIcon />
             </Button>
           </DropdownTrigger>
-          <DropdownMenu aria-label="">
+          <DropdownMenu
+            aria-label="選擇衣物標記"
+            onAction={(target) => {
+              setCoverImage(target.toString());
+            }}
+          >
             <DropdownSection title="選擇標記">
-              <DropdownItem key="new">衣服</DropdownItem>
-              <DropdownItem key="copy">褲子</DropdownItem>
+              <DropdownItem key="clothes">衣服</DropdownItem>
+              <DropdownItem key="pants">褲子</DropdownItem>
+              <DropdownItem key="jacket">外套</DropdownItem>
+              <DropdownItem key="socks">襪子與其他</DropdownItem>
             </DropdownSection>
           </DropdownMenu>
         </Dropdown>
@@ -61,21 +78,21 @@ export default function ClothesCard({ clothes }: Props) {
       <Link
         href={`/clothes/${clothes.transactionId}?sensorId=${clothes.sensorId}`}
       >
-        <CardHeader className="flex-col items-start px-4 pb-0 pt-2">
-          <Divider className="my-1" />
-          <small className="text-default-500">
-            等待時間：{clothes.prediction} 分鐘
-          </small>
+        <CardHeader className="flex-col items-start pb-0 pl-4 pt-2">
+          <Divider className="mb-4" />
+          <p className="text-default-500">
+            等待時間：{clothes.prediction.toFixed(0)} 分鐘
+          </p>
         </CardHeader>
         <CardBody>
           <Image
             as={NextImage}
             alt="Card background"
-            className="h-auto w-auto rounded-xl object-cover"
-            src="/pants.png"
+            className="h-[300px] w-[300px] rounded-xl object-cover"
+            src={`/${coverImage}.png`}
             priority={true}
-            width={300}
-            height={300}
+            width={200}
+            height={200}
           />
         </CardBody>
       </Link>

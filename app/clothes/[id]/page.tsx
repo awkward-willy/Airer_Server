@@ -1,5 +1,5 @@
 import { getClothesDetail } from "@/action/getClothesDetail";
-import ClothesChart from "@/components/ClothesChart";
+import ClothesChart from "@/components/Clothes/ClothesChart";
 import Title from "@/components/Title";
 import { ClothesDetail } from "@/type/clothesDetail";
 import { Divider } from "@nextui-org/divider";
@@ -26,7 +26,7 @@ export default async function ClothesDetailPage({
   let sensorIdDataArray: ClothesDetail[][] = [];
 
   if (sensorId == null) {
-    // 建立 array in array，相同的 sensorId 放在同一個 array，如[[{sensorId: 1, ...}, {sensorId: 1, ...}], [{sensorId: 2, ...}]]
+    // 建立 array in array，相同的 sensorId 放在同一個 array
     const sensorIdArray = Array.from(
       new Set(clothesDetail.map((data) => data.sensorId)),
     );

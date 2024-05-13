@@ -4,6 +4,8 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
 import { Button } from "@nextui-org/button";
+import { Tooltip } from "@nextui-org/react";
+import { Spinner } from "@nextui-org/spinner";
 
 function SunIcon() {
   return (
@@ -56,19 +58,23 @@ export function ThemeSwitcher() {
     }
   }, [resolvedTheme, setTheme]);
 
-  if (!mounted) return null;
+  if (!mounted) {
+    return <Spinner size="sm" color="default" />;
+  }
 
   return (
-    <Button
-      aria-label="Toggle Dark Mode"
-      onClick={() => {
-        setTheme(theme === "dark" ? "light" : "dark");
-      }}
-      variant="light"
-      isIconOnly
-      className="w-full justify-center border-none"
-    >
-      {theme === "dark" ? <MoonIcon /> : <SunIcon />}
-    </Button>
+    <Tooltip content="切換深淺色模式" showArrow closeDelay={100}>
+      <Button
+        aria-label="Toggle Dark Mode"
+        onClick={() => {
+          setTheme(theme === "dark" ? "light" : "dark");
+        }}
+        variant="light"
+        isIconOnly
+        className="w-full justify-center border-none"
+      >
+        {theme === "dark" ? <MoonIcon /> : <SunIcon />}
+      </Button>
+    </Tooltip>
   );
 }

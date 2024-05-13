@@ -4,62 +4,15 @@ import React, { useEffect, useState } from "react";
 
 import { getWeather } from "@/action/getWeather";
 import type { Weather } from "@/type/weather";
-import { Accordion, AccordionItem } from "@nextui-org/react";
+import { mapWeatherCodeToIcon } from "@/util/mapWeatherCodeToIcon";
+import { Skeleton } from "@nextui-org/skeleton";
 import { Spinner } from "@nextui-org/spinner";
 
-function mapWeatherCodeToIcon(code: number) {
-  switch (code) {
-    // Code	Description from OpenMeteo
-    // 0	Clear sky
-    // 1, 2, 3	Mainly clear, partly cloudy, and overcast
-    // 45, 48	Fog and depositing rime fog
-    // 51, 53, 55	Drizzle: Light, moderate, and dense intensity
-    // 56, 57	Freezing Drizzle: Light and dense intensity
-    // 61, 63, 65	Rain: Slight, moderate and heavy intensity
-    // 66, 67	Freezing Rain: Light and heavy intensity
-    // 71, 73, 75	Snow fall: Slight, moderate, and heavy intensity
-    // 77	Snow grains
-    // 80, 81, 82	Rain showers: Slight, moderate, and violent
-    // 85, 86	Snow showers slight and heavy
-    case 0:
-      return "☀️";
-    case 1:
-    case 2:
-    case 3:
-      return "⛅";
-    case 45:
-    case 48:
-      return "🌁";
-    case 51:
-    case 53:
-    case 55:
-    case 61:
-    case 63:
-    case 65:
-    case 80:
-    case 81:
-    case 82:
-      return "🌧️";
-    case 56:
-    case 57:
-    case 66:
-    case 67:
-      return "🥶";
-    case 71:
-    case 73:
-    case 75:
-    case 77:
-    case 85:
-    case 86:
-      return "❄️";
-    default:
-      return "❓";
-  }
-}
+import WeatherInfo from "./WeatherInfo";
 
 export default function Weather() {
-  const [lat, setLat] = useState(-1);
-  const [lon, setLon] = useState(-1);
+  const [lat, setLat] = useState(24.96715701074786);
+  const [lon, setLon] = useState(121.1877090747221);
   const [weather, setWeather] = useState<Weather>({
     time: new Date(),
     temperature2m: -1,
@@ -67,14 +20,14 @@ export default function Weather() {
     weatherCode: -1,
   });
 
-  // 確保在瀏覽器環境下才取得經緯度
-  if (typeof navigator !== "undefined") {
-    navigator.geolocation.getCurrentPosition((position) => {
-      const { latitude, longitude } = position.coords;
-      setLat(latitude);
-      setLon(longitude);
-    });
-  }
+  // // 確保在瀏覽器環境下才取得經緯度
+  // if (typeof navigator !== "undefined") {
+  //   navigator.geolocation.getCurrentPosition((position) => {
+  //     const { latitude, longitude } = position.coords;
+  //     setLat(latitude);
+  //     setLon(longitude);
+  //   });
+  // }
 
   useEffect(() => {
     async function fetchData() {
@@ -97,13 +50,14 @@ export default function Weather() {
 
     const timeoutId = setTimeout(() => {
       // 如果 1分鐘後還沒有取得天氣資訊，就顯示無法取得天氣資訊
-      setWeather({
-        time: new Date(),
-        temperature2m: NaN,
-        relativeHumidity2m: NaN,
-        weatherCode: NaN,
-      });
-      1;
+      if (weather.temperature2m == -1 || weather.relativeHumidity2m == -1) {
+        setWeather({
+          time: new Date(),
+          temperature2m: NaN,
+          relativeHumidity2m: NaN,
+          weatherCode: NaN,
+        });
+      }
     }, 60000);
 
     fetchData();
@@ -111,7 +65,7 @@ export default function Weather() {
     return () => {
       clearTimeout(timeoutId);
     };
-  }, [lat, lon]);
+  }, [lat, lon, weather.relativeHumidity2m, weather.temperature2m]);
 
   return (
     <div className="flex flex-wrap gap-4">
@@ -119,10 +73,26 @@ export default function Weather() {
       lon == -1 ||
       weather.temperature2m == -1 ||
       weather.relativeHumidity2m == -1 ? (
-        <>
-          <Spinner color="default" />
-          <p>正在取得天氣資訊 ...</p>
-        </>
+        <div className="flex h-56 w-full flex-col items-start gap-2">
+          <div className="flex gap-2">
+            <Spinner color="default" />
+            <p>正在取得天氣資訊 ...</p>
+          </div>
+          <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-3">
+            <Skeleton className="h-7 w-full" />
+            <Skeleton className="h-7 w-full" />
+            <Skeleton className="h-7 w-full" />
+            <Skeleton className="h-7 w-full" />
+            <Skeleton className="h-7 w-full" />
+            <Skeleton className="h-7 w-full" />
+            <Skeleton className="h-7 w-full" />
+            <Skeleton className="h-7 w-full" />
+            <Skeleton className="h-7 w-full" />
+            <Skeleton className="h-7 w-full" />
+            <Skeleton className="h-7 w-full" />
+            <Skeleton className="h-7 w-full" />
+          </div>
+        </div>
       ) : Number.isNaN(weather.temperature2m) ? (
         <p>無法取得天氣資訊</p>
       ) : (
@@ -132,7 +102,8 @@ export default function Weather() {
           <p>天氣狀況：{mapWeatherCodeToIcon(weather.weatherCode)}</p>
           <p>溫度：{weather.temperature2m.toFixed(2)}°C</p>
           <p>相對濕度：{weather.relativeHumidity2m.toFixed(2)}%</p>
-          <Accordion variant="bordered" isCompact>
+          <WeatherInfo weather={weather} />
+          {/* <Accordion variant="bordered" isCompact>
             <AccordionItem title="可能會下雨的時間：">
               {weather.badWeather && weather.badWeather.length > 0 ? (
                 <ul>
@@ -146,7 +117,7 @@ export default function Weather() {
                 <p>沒有下雨的時間</p>
               )}
             </AccordionItem>
-          </Accordion>
+          </Accordion> */}
         </>
       )}
     </div>

@@ -4,6 +4,7 @@ interface Weather {
   relativeHumidity2m: number;
   weatherCode: number;
   badWeather?: Weather[];
+  allWeather?: any;
 }
 
 export type { Weather };

@@ -30,7 +30,7 @@ export default function RootLayout({
           >
             <>
               <Nav />
-              <main className="m-6 h-full">{children}</main>
+              <main className="m-4 h-full sm:m-8">{children}</main>
             </>
           </NextThemesProvider>
         </Providers>
