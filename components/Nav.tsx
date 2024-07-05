@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useReducer } from "react";
 
 import {
   Navbar,
@@ -12,7 +12,6 @@ import {
   NavbarMenuItem,
   NavbarMenuToggle,
 } from "@nextui-org/navbar";
-import { Tooltip } from "@nextui-org/tooltip";
 
 import { ThemeSwitcher } from "./ThemeSwitcher";
 
@@ -23,12 +22,18 @@ const menuItems = [
 ];
 
 export default function Nav() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useReducer((current) => !current, false);
+
   return (
-    <Navbar onMenuOpenChange={setIsMenuOpen} isBordered>
+    <Navbar
+      isMenuOpen={isMenuOpen}
+      onMenuOpenChange={setIsMenuOpen}
+      isBordered
+      isBlurred={false}
+    >
       <NavbarContent>
         <NavbarBrand>
-          <p className="font-bold text-inherit">智慧衣架</p>
+          <p className="font-bold text-inherit">晾曬時間預測系統</p>
         </NavbarBrand>
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "關閉的選單" : "開啟的選單"}
@@ -50,7 +55,7 @@ export default function Nav() {
           ))}
         </>
       </NavbarContent>
-      <NavbarMenu>
+      <NavbarMenu onClick={() => setIsMenuOpen()}>
         <>
           {menuItems.map((item, index) => (
             <NavbarMenuItem key={`${item}-${index}`}>

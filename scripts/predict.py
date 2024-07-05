@@ -1,13 +1,74 @@
+import os
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '5'
+import keras._tf_keras.keras.saving
+import pandas as pd
+import numpy as np
 import joblib
-MODEL_PATH = "./MinMaxScaler()_poly_0.1_5_0.5.pkl"
+
+TEST_FILE_NAME = '0428.csv'
+SLIDING_WINDOW = 10
+dataPointsPerMin = 6
 
 json_obj = {}
 
-# print current directory
-clf = joblib.load("./scripts/MinMaxScaler()_poly_0.1_5_0.5.pkl")
-prediction = clf.predict([[0.91077441, 0.33884298, 0.6557377,  0.61111111, 0.06601244, 0.90572391, 0.34710744, 0.65245902, 0.61111111, 0.06606303, 0.9040404,  0.3553719, 0.65081967, 0.61904762, 0.06640026, 0.90909091, 0.3553719,  0.64918033, 0.61904762, 0.06651829, 0.89393939, 0.36363636, 0.64754098, 0.624, 0.06641712, 0.90740741, 0.36363636, 0.64754098, 0.624, 0.06671506, 0.9040404, 0.37190083, 0.64918033, 0.632, 0.06683561, 0.8973064, 0.37190083, 0.65081967, 0.62903226, 0.93734569, 0.89225589, 0.37190083, 0.71639344, 0.62903226, 1.03831975, 0.87205387, 0.37190083, 0.84754098, 0.61290323, 1.03197822]])
+test_data = pd.read_csv(TEST_FILE_NAME, header=None)
 
-json_obj["prediction"] = prediction[0]
+if len(test_data.columns) == 8:
+    label = ['Time', 'Humidity_Clo', 'TempC_Clo', 'TempF_Clo',
+             'Humidity_Sur', 'TempC_Sur', 'TempF_Sur', 'Weight']
+    test_data.columns = label
+    for i in range(SLIDING_WINDOW, len(test_data)):
+        if test_data['Weight'][i] < 50:
+            continue
+        y = test_data['Weight'][i-SLIDING_WINDOW:i]
+        # mean slope
+        slope = (y.iloc[-1] - y.iloc[0]) / SLIDING_WINDOW
+        if abs(slope) < 0.01:
+            dryTime = i
+            break
+elif len(test_data.columns) == 10:
+    label = ['Time', 'Humidity_Clo', 'TempC_Clo', 'TempF_Clo',
+             'Humidity_Sur', 'TempC_Sur', 'TempF_Sur', 'Weight', 'Wet_Sur', 'Wet_Clo']
+    test_data.columns = label
+    for i in range(SLIDING_WINDOW, len(test_data)):
+        if test_data['Weight'][i] < 50:
+            continue
+        if test_data['Wet_Clo'][i] <= 3 and i > 15:
+            dryTime = i
+            break
+
+X = np.array([])
+for i in range(SLIDING_WINDOW, len(test_data)):
+    tenMinData = np.array([])
+    for j in range(i-SLIDING_WINDOW, i):
+        oneMinData = np.array([])
+        oneMinData = np.append(oneMinData, test_data['Weight'][0])
+        oneMinData = np.append(oneMinData, test_data['Humidity_Clo'][j])
+        oneMinData = np.append(oneMinData, test_data['TempC_Clo'][j])
+        oneMinData = np.append(oneMinData, test_data['Humidity_Sur'][j])
+        oneMinData = np.append(oneMinData, test_data['TempC_Sur'][j])
+        oneMinData = np.append(oneMinData, test_data['Weight'][j])
+        tenMinData = np.append(tenMinData, oneMinData)
+    if (i < dryTime):
+        tenMinData = np.append(tenMinData, (dryTime - i))
+    else:
+        tenMinData = np.append(tenMinData, 0)
+    X = np.append(X, tenMinData)
+X = X.reshape(-1, SLIDING_WINDOW*dataPointsPerMin+1)
+Y = X[:, -1]
+X = X[:, :-1]
+
+
+scaler = joblib.load("scaler.save")
+
+X = scaler.transform(X)
+
+model = keras.saving.load_model("model.keras")
+
+predictions = model.predict(X, verbose=0)
+
+json_obj["prediction"] = predictions[0][0]
 
 
 print(json_obj)

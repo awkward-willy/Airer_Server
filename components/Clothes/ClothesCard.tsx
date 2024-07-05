@@ -53,10 +53,10 @@ export default function ClothesCard({ clothes }: Props) {
   return (
     <Card className="w-fit p-4">
       <div className="flex items-baseline justify-between pl-4">
-        <h4 className="text-large font-bold">衣架 {clothes.sensorId + 1}</h4>
+        <h2 className="text-large font-bold">衣架 {clothes.sensorId + 1}</h2>
         <Dropdown>
           <DropdownTrigger>
-            <Button variant="light" isIconOnly>
+            <Button variant="light" isIconOnly aria-label="選擇標記">
               <ChevronDownIcon />
             </Button>
           </DropdownTrigger>
@@ -80,9 +80,13 @@ export default function ClothesCard({ clothes }: Props) {
       >
         <CardHeader className="flex-col items-start pb-0 pl-4 pt-2">
           <Divider className="mb-4" />
-          <p className="text-default-500">
-            等待時間：{clothes.prediction.toFixed(0)} 分鐘
-          </p>
+          {clothes.prediction == -1 ? (
+            <p className="text-default-500">仍在預測中...</p>
+          ) : (
+            <p className="text-default-500">
+              等待時間：{clothes.prediction.toFixed(0)} 分鐘
+            </p>
+          )}
         </CardHeader>
         <CardBody>
           <Image

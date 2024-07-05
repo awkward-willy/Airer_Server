@@ -27,10 +27,13 @@ export async function getRecentData() {
     const filteredData = Array.from(sensorIds).map((sensorId) => {
       const sensorData = allData.filter((data) => data.sensorId === sensorId);
       const newestData = sensorData.reduce((prev, current) =>
-        prev.createdAt > current.createdAt ? prev : current,
+        prev.createdAt > current.createdAt ? prev : current
       );
       return newestData;
     });
+
+    // 依據 sensorId 排序
+    filteredData.sort((a, b) => a.sensorId - b.sensorId);
 
     return filteredData;
   } catch (error) {

@@ -2,7 +2,6 @@ import { getClothesDetail } from "@/action/getClothesDetail";
 import ClothesChart from "@/components/Clothes/ClothesChart";
 import Title from "@/components/Title";
 import { ClothesDetail } from "@/type/clothesDetail";
-import { Divider } from "@nextui-org/divider";
 
 type Props = {
   params: {
@@ -10,6 +9,8 @@ type Props = {
   };
   searchParams: { [key: string]: string | string[] | undefined };
 };
+
+export const dynamic = "force-dynamic";
 
 export default async function ClothesDetailPage({
   params,
@@ -19,19 +20,18 @@ export default async function ClothesDetailPage({
   const { sensorId } = searchParams;
   const clothesDetail: ClothesDetail[] = await getClothesDetail(
     id.toString(),
-    parseInt(sensorId as string),
+    parseInt(sensorId as string)
   );
-  const time = 0;
 
   let sensorIdDataArray: ClothesDetail[][] = [];
 
   if (sensorId == null) {
     // 建立 array in array，相同的 sensorId 放在同一個 array
     const sensorIdArray = Array.from(
-      new Set(clothesDetail.map((data) => data.sensorId)),
+      new Set(clothesDetail.map((data) => data.sensorId))
     );
     sensorIdDataArray = sensorIdArray.map((sensorId) =>
-      clothesDetail.filter((data) => data.sensorId === sensorId),
+      clothesDetail.filter((data) => data.sensorId === sensorId)
     );
   }
 
@@ -39,18 +39,21 @@ export default async function ClothesDetailPage({
     <div className="flex flex-col gap-4">
       <Title content="衣物詳情" />
       {clothesDetail.length === 0 ? (
-        <p>找不到衣物資訊</p>
+        <p className="text-lg">找不到衣物資訊</p>
       ) : sensorId == null ? (
         <>
-          <div className="mb-16 flex min-h-40 flex-col gap-20 border-blue-950 dark:border-blue-50">
+          <div className="mb-16 flex flex-col border-blue-950 dark:border-blue-50">
             {sensorIdDataArray.map((sensorIdData, index) => (
-              <div key={index} className="h-96">
-                <p>衣物 {index + 1}</p>
+              <div key={index} className="h-fit">
+                <p className="pb-2 text-xl font-bold">
+                  衣物 {sensorIdData[0].sensorId + 1}
+                </p>
+
                 <ClothesChart clothesDetail={sensorIdData} />
                 {
                   // 除了最後一個衣物，都加上分隔線
                   index !== sensorIdDataArray.length - 1 && (
-                    <Divider className="my-8 h-0.5 bg-blue-950 dark:bg-blue-50" />
+                    <div className="my-8 border-t border-dashed border-gray-400"></div>
                   )
                 }
               </div>
@@ -59,9 +62,21 @@ export default async function ClothesDetailPage({
         </>
       ) : (
         <>
-          <p>衣物編號：{sensorId}</p>
-          <p>預計乾燥時間：{time}</p>
-          <div className="h-96">
+          <p className="pb-2 text-xl">
+            衣物編號：<i>{Number(sensorId) + 1}</i>
+          </p>
+          {clothesDetail[clothesDetail.length - 1].prediction === -1 ? (
+            <p className="text-lg">預計乾燥時間：仍在預測中...</p>
+          ) : (
+            <p className="text-lg">
+              預計乾燥時間：
+              {clothesDetail[clothesDetail.length - 1].prediction.toFixed(
+                0
+              )}{" "}
+              分鐘
+            </p>
+          )}
+          <div className="h-fit">
             <ClothesChart clothesDetail={clothesDetail} />
           </div>
         </>

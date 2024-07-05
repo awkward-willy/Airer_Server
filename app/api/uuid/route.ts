@@ -3,6 +3,8 @@ import { v4 as uuidv4 } from "uuid";
 
 import { PrismaClient } from "@prisma/client";
 
+export const dynamic = "force-dynamic";
+
 const prisma = new PrismaClient();
 
 export async function GET() {
@@ -18,7 +20,7 @@ export async function GET() {
       if (count > 20) {
         return NextResponse.json(
           { error: "Failed to generate a unique UUID" },
-          { status: 500 },
+          { status: 500 }
         );
       }
     }
@@ -28,7 +30,7 @@ export async function GET() {
     console.error(error);
     return NextResponse.json(
       { error: "An error occurred while generating a new UUID" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

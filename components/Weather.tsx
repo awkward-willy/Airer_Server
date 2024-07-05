@@ -20,15 +20,6 @@ export default function Weather() {
     weatherCode: -1,
   });
 
-  // // 確保在瀏覽器環境下才取得經緯度
-  // if (typeof navigator !== "undefined") {
-  //   navigator.geolocation.getCurrentPosition((position) => {
-  //     const { latitude, longitude } = position.coords;
-  //     setLat(latitude);
-  //     setLon(longitude);
-  //   });
-  // }
-
   useEffect(() => {
     async function fetchData() {
       // 如果沒有取得經緯度，就不要取得天氣資訊
@@ -76,7 +67,7 @@ export default function Weather() {
         <div className="flex h-56 w-full flex-col items-start gap-2">
           <div className="flex gap-2">
             <Spinner color="default" />
-            <p>正在取得天氣資訊 ...</p>
+            <p className="text-lg">正在取得天氣資訊 ...</p>
           </div>
           <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-3">
             <Skeleton className="h-7 w-full" />
@@ -94,30 +85,37 @@ export default function Weather() {
           </div>
         </div>
       ) : Number.isNaN(weather.temperature2m) ? (
-        <p>無法取得天氣資訊</p>
+        <p className="text-lg">無法取得天氣資訊</p>
       ) : (
         <>
-          <p>經度：{lat.toFixed(2)}</p>
-          <p>緯度：{lon.toFixed(2)}</p>
-          <p>天氣狀況：{mapWeatherCodeToIcon(weather.weatherCode)}</p>
-          <p>溫度：{weather.temperature2m.toFixed(2)}°C</p>
-          <p>相對濕度：{weather.relativeHumidity2m.toFixed(2)}%</p>
+          <p className="text-lg">
+            經度：
+            <strong>
+              <i>{lat.toFixed(2)}</i>
+            </strong>
+          </p>
+          <p className="text-lg">
+            緯度：
+            <strong>
+              <i>{lon.toFixed(2)}</i>
+            </strong>
+          </p>
+          <p className="text-lg">
+            天氣狀況：{mapWeatherCodeToIcon(weather.weatherCode)}
+          </p>
+          <p className="text-lg">
+            溫度：
+            <strong>
+              <i> {weather.temperature2m.toFixed(2)}°C</i>
+            </strong>
+          </p>
+          <p className="text-lg">
+            相對濕度：
+            <strong>
+              <i>{weather.relativeHumidity2m.toFixed(2)}%</i>
+            </strong>
+          </p>
           <WeatherInfo weather={weather} />
-          {/* <Accordion variant="bordered" isCompact>
-            <AccordionItem title="可能會下雨的時間：">
-              {weather.badWeather && weather.badWeather.length > 0 ? (
-                <ul>
-                  {weather.badWeather.map((badWeather: Weather) => (
-                    <li key={badWeather.time.toISOString()}>
-                      {badWeather.time.toLocaleString()}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>沒有下雨的時間</p>
-              )}
-            </AccordionItem>
-          </Accordion> */}
         </>
       )}
     </div>

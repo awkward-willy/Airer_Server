@@ -7,6 +7,8 @@ import PastDataWrapper from "@/components/PastData/PastDataWrapper";
 import Title from "@/components/Title";
 import { Skeleton } from "@nextui-org/skeleton";
 
+export const dynamic = "force-dynamic";
+
 export default async function PastdataPage() {
   const files = await getAllTransactionId();
   return (

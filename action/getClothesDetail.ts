@@ -18,6 +18,9 @@ export async function getClothesDetail(filename: string, sensorId: number) {
         return [];
       }
 
+      // sort by sensorId
+      sensorData.sort((a, b) => a.sensorId - b.sensorId);
+
       return sensorData;
     }
 

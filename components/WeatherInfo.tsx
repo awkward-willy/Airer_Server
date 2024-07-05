@@ -24,25 +24,28 @@ function findBestTime(weather: Weather) {
     return undefined;
   }
 
-  const time = weather.time;
-  const date = new Date(time);
-  const year = date.getFullYear();
-  const month = date.getMonth();
-  const day = date.getDate();
-  const nextDay = new Date(year, month, day + 1).getTime();
-  const nextDayIndex = weather.allWeather.time.findIndex(
-    (t: { getTime: () => number }) => t.getTime() >= nextDay,
+  // Array 儲存每天的下雨次數
+  const rainCount = new Array(7).fill(0);
+
+  if (weather.badWeather) {
+    weather.badWeather.forEach((badWeather) => {
+      const day = badWeather.time.getDay();
+      rainCount[day] += 1;
+    });
+  }
+
+  // 找出下雨次數最少的日期
+  const minIndex = rainCount.indexOf(Math.min(...rainCount));
+
+  // 找出該日期的所有時間
+  const time = weather.allWeather.time.filter(
+    (time: { getDay: () => number }) => time.getDay() === minIndex
   );
-  const nextDayWeather = weather.allWeather.weatherCode.slice(
-    nextDayIndex,
-    nextDayIndex + 24,
-  );
-  const nextDayRain = nextDayWeather.filter(
-    (code: number) => code >= 20,
-  ).length;
-  const bestTimeIndex = nextDayWeather.findIndex((code: number) => code < 20);
-  const bestTime = weather.allWeather.time[bestTimeIndex + nextDayIndex];
-  return { time: bestTime, rain: nextDayRain };
+
+  // 找出最早的時間
+  const minTime = time.reduce((a: number, b: number) => (a < b ? a : b));
+
+  return { time: minTime, count: rainCount[minIndex] };
 }
 
 export default function WeatherInfo({ weather }: Props) {
@@ -68,7 +71,7 @@ export default function WeatherInfo({ weather }: Props) {
         "group-data-[last=true]:last:before:rounded-none",
       ],
     }),
-    [],
+    []
   );
 
   return (
@@ -81,6 +84,8 @@ export default function WeatherInfo({ weather }: Props) {
             </legend>
             <p className="p-2">
               {findBestTime(weather)?.time.toLocaleDateString()}
+              ，當天下雨小時數：
+              {" " + findBestTime(weather)?.count}
             </p>
           </fieldset>
         </CardBody>
@@ -135,7 +140,7 @@ export default function WeatherInfo({ weather }: Props) {
                           toISOString: () => string;
                           toLocaleString: () => string;
                         },
-                        index: string | number,
+                        index: string | number
                       ) => (
                         <TableRow key={time.toISOString()}>
                           <TableCell>{time.toLocaleString()}</TableCell>
@@ -151,11 +156,11 @@ export default function WeatherInfo({ weather }: Props) {
                           </TableCell>
                           <TableCell className="text-center">
                             {mapWeatherCodeToIcon(
-                              weather.allWeather.weatherCode[index],
+                              weather.allWeather.weatherCode[index]
                             )}
                           </TableCell>
                         </TableRow>
-                      ),
+                      )
                     )
                   ) : (
                     <TableRow>
